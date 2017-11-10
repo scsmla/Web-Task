@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Canvas</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <h2>Play game with us</h2>
+    Score:
+    <p id="score" style="display: inline">0</p>
+    <br/> Level:
+    <p id="level" style="display: inline">1</p>
+    <br/>
+    <canvas id="myCanvas" width="600" height="600" style="border:1px solid #c3c3c3;">
+    </canvas>
+    <script>
+        var width = 40;
+        var height = 40;
+        var score = 0;
+        var level = 1;
+        var currentLevel = 1;
+        var currentScore = 0;
+        var enemy1 = {
+            x: 100,
+            y: 0,
+            dy: 1
+
+        }
+        var enemy2 = {
+            x: 300,
+            y: 200,
+            dy: 1
+        }
+        var enemy3 = {
+            x: 500,
+            y: 350,
+            dy: 1
+        }
+        var goal = {
+            x: 560,
+            y: 300,
+            height: 40,
+            width: 40
+        }
+        var player = {
+            x: 0,
+            y: 300,
+        }
+
+
+
+        var WIDTH = 600;
+        var HEIGHT = 600;
+        var speed = 10;
+
+        var c = document.getElementById("myCanvas");
+        var cxt = c.getContext("2d");
+
+        cxt.fillStyle = '#FFFFFF';
+        cxt.fillRect(0, 0, WIDTH, HEIGHT);
+
+        function clear() {
+
+            cxt.fillStyle = '#FFFFFF';
+            cxt.fillRect(0, 0, WIDTH, HEIGHT);
+
+        }
+
+        function checkPlayer() {
+            var x;
+            var y;
+            //Traverse all vertex of the player
+            x = player.x;
+            y = player.y;
+            if (x >= enemy1.x && x <= enemy1.x + width) {
+                if (y >= enemy1.y && y <= enemy1.y + height) {
+                    return true;
+                }
+            }
+            if (x >= enemy2.x && x <= enemy2.x + width) {
+                if (y >= enemy2.y && y <= enemy2.y + height) {
+                    return true;
+                }
+            }
+            if (x >= enemy3.x && x <= enemy3.x + width) {
+                if (y >= enemy3.y && y <= enemy3.y + height) {
+                    return true;
+                }
+            }
+
+
+            x = player.x + width;
+            if (x >= enemy1.x && x <= enemy1.x + width) {
+                if (y >= enemy1.y && y <= enemy1.y + height) {
+                    return true;
+                }
+            }
+            if (x >= enemy2.x && x <= enemy2.x + width) {
+                if (y >= enemy2.y && y <= enemy2.y + height) {
+                    return true;
+                }
+            }
+            if (x >= enemy3.x && x <= enemy3.x + width) {
+                if (y >= enemy3.y && y <= enemy3.y + height) {
+                    return true;
+                }
+            }
+
+            y = player.y + height;
+            if (x >= enemy1.x && x <= enemy1.x + width) {
+                if (y >= enemy1.y && y <= enemy1.y + height) {
+                    return true;
+                }
+            }
+            if (x > enemy2.x && x < enemy2.x + width) {
+                if (y > enemy2.y && y < enemy2.y + height) {
+                    return true;
+                }
+            }
+            if (x >= enemy3.x && x <= enemy3.x + width) {
+                if (y >= enemy3.y && y <= enemy3.y + height) {
+                    return true;
+                }
+            }
+
+            x = player.x;
+            if (x > enemy1.x && x < enemy1.x + width) {
+                if (y > enemy1.y && y < enemy1.y + height) {
+                    return true;
+                }
+            }
+            if (x >= enemy2.x && x <= enemy2.x + width) {
+                if (y >= enemy2.y && y <= enemy2.y + height) {
+                    return true;
+                }
+            }
+            if (x >= enemy3.x && x <= enemy3.x + width) {
+                if (y >= enemy3.y && y <= enemy3.y + height) {
+                    return true;
+                }
+            }
+
+        }
+
+        function init() {
+            return setInterval(draw, speed);
+        }
+
+        document.onkeypress = function movePlayer(event) {
+
+            var keyStroke = event.keyCode || event.which;
+            switch (keyStroke) {
+                case 97: //the key a
+                    if (player.x > 0)
+                        player.x -= 5;
+                    break;
+                case 115: //the key s
+                    if (player.y + height < HEIGHT)
+                        player.y += 5;
+                    break;
+                case 100: //the key d
+                    if (player.x + width < WIDTH)
+                        player.x += 5;
+                    break;
+                case 119: //the key w
+                    if (player.y > 0)
+                        player.y -= 5;
+                    break;
+            }
+
+            drawRect(player.x, player.y, width, height, "black");
+            if (checkPlayer()) {
+                alert("Stupid");
+                player.x = 0;
+                player.y = 350;
+                drawRect(player.x, player.y, width, height, "black");
+            }
+            if (checkPlayGoal()) {
+                alert("Good job");
+                player.x = 0;
+                player.y = 300;
+                drawRect(player.x, player.y, width, height, "black");
+                enemy1.dy = Math.abs(enemy1.dy) + 1;
+                enemy2.dy = Math.abs(enemy2.dy) + 1;
+                enemy3.dy = Math.abs(enemy3.dy) + 1;
+                var score = currentScore == 0 ? 1 : currentScore * 2;
+                currentScore = score;
+                document.getElementById("score").innerHTML = score;
+                document.getElementById("level").innerHTML = ++currentLevel;
+                // currentScore == 1 ? 1: currentScore *= 2;
+                // setLevelAndScore(++currentLevel, currentScore);
+
+            }
+        }
+
+        function checkPlayGoal() {
+            var x = player.x;
+            var y = player.y;
+            if (x >= goal.x && x <= goal.x + width) {
+                if (y >= goal.y && y <= goal.y + height) {
+                    return true;
+                }
+            }
+
+            y = player.y + height;
+            if (x >= goal.x && x <= goal.x + width) {
+                if (y >= goal.y && y <= goal.y + height) {
+                    return true;
+                }
+            }
+
+            x = player.x + width;
+            if (x >= goal.x && x <= goal.x + width) {
+                if (y >= goal.y && y <= goal.y + height) {
+                    return true;
+                }
+            }
+
+            y = player.y;
+            if (x >= goal.x && x <= goal.x + width) {
+                if (y >= goal.y && y <= goal.y + height) {
+                    return true;
+                }
+            }
+        }
+
+        function drawRect(x, y, width, height, color) {
+            cxt.beginPath();
+            cxt.fillStyle = color;
+            cxt.fillRect(x, y, width, height);
+            cxt.closePath();
+        }
+
+        function draw() {
+            clear();
+            drawRect(enemy1.x, enemy1.y, width, height, "blue");
+            drawRect(enemy2.x, enemy2.y, width, height, "blue");
+            drawRect(enemy3.x, enemy3.y, width, height, "blue");
+            drawRect(goal.x, goal.y, width, height, "yellow");
+            drawRect(player.x, player.y, width, height, "black");
+            if (enemy1.y + height > WIDTH || enemy1.y < 0)
+                enemy1.dy = -enemy1.dy;
+            if (enemy2.y + height > WIDTH || enemy2.y < 0)
+                enemy2.dy = -enemy2.dy;
+            if (enemy3.y + height > WIDTH || enemy3.y < 0)
+                enemy3.dy = -enemy3.dy;
+            enemy1.y += enemy1.dy;
+            enemy2.y += enemy2.dy;
+            enemy3.y += enemy3.dy;
+            if (checkPlayer()) {
+                alert("Stupid");
+                player.x = 0;
+                player.y = 350;
+                drawRect(player.x, player.y, width, height, "black");
+            }
+        }
+
+
+        init();
+    </script>
+</body>
+
+</html>
